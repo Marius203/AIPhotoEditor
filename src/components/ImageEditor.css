@@ -1,0 +1,48 @@
+.image-editor-container {
+    background: white;
+    border-radius: 16px;
+    padding: 2rem;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.image-editor-container h3 {
+    margin-top: 0;
+    margin-bottom: 1.25rem;
+    color: #1f2937;
+    font-size: 1.125rem;
+    font-weight: 600;
+}
+
+.edited-image-wrapper {
+    margin-bottom: 1.5rem;
+}
+
+.edited-image-wrapper img {
+    max-width: 100%;
+    border-radius: 12px;
+    border: 1px solid #e5e7eb;
+}
+
+.download-button {
+    width: 100%;
+    padding: 0.875rem 1.5rem;
+    background: #10b981;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.download-button:hover {
+    background: #059669;
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
+}
+
+.download-button:active {
+    background: #047857;
+    transform: scale(0.98);
+}

@@ -1,0 +1,63 @@
+.image-upload-container {
+    width: 100%;
+}
+
+.image-upload-form {
+    border: 2px dashed #d1d5db;
+    border-radius: 16px;
+    padding: 3rem 2rem;
+    background: white;
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.image-upload-form:hover {
+    border-color: #3b82f6;
+    background: #f9fafb;
+}
+
+.image-upload-form.drag-active {
+    border-color: #3b82f6;
+    background: #eff6ff;
+    transform: scale(1.01);
+}
+
+.upload-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+}
+
+.upload-icon {
+    width: 64px;
+    height: 64px;
+    color: #667eea;
+}
+
+.upload-text {
+    font-size: 1.1rem;
+    color: #333;
+    margin: 0;
+}
+
+.upload-button {
+    background: none;
+    border: none;
+    color: #667eea;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: underline;
+    font-size: inherit;
+    padding: 0;
+}
+
+.upload-button:hover {
+    color: #5568d3;
+}
+
+.upload-hint {
+    font-size: 0.9rem;
+    color: #999;
+    margin: 0;
+}
