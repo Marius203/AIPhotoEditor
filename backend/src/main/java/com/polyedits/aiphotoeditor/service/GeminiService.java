@@ -4,8 +4,15 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.polyedits.aiphotoeditor.dto.ImageEditResponse;
+import com.polyedits.aiphotoeditor.model.ImageEdit;
+import com.polyedits.aiphotoeditor.model.User;
+import com.polyedits.aiphotoeditor.repository.ImageEditRepository;
+import com.polyedits.aiphotoeditor.repository.UserRepository;
 import okhttp3.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -19,8 +26,23 @@ public class GeminiService {
     @Value("${gemini.api.model}")
     private String model;
 
+    @Autowired
+    private ImageEditRepository imageEditRepository;
+
+    @Autowired
+    private UserRepository userRepository;
+
     private final OkHttpClient client = new OkHttpClient();
     private final Gson gson = new Gson();
+
+    private User getCurrentUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.isAuthenticated() && !(authentication.getPrincipal() instanceof String)) {
+            String username = authentication.getName();
+            return userRepository.findByUsername(username).orElse(null);
+        }
+        return null;
+    }
 
     public ImageEditResponse editImage(String base64Image, String prompt, String mimeType) throws IOException {
         String url = String.format(
@@ -85,6 +107,16 @@ public class GeminiService {
                             String imageData = inlineDataResponse.get("data").getAsString();
                             String responseMimeType = inlineDataResponse.get("mimeType").getAsString();
 
+                            // Save to DB with current user
+                            try {
+                                User currentUser = getCurrentUser();
+                                ImageEdit imageEdit = new ImageEdit(prompt, mimeType, true, null);
+                                imageEdit.setUser(currentUser);
+                                imageEditRepository.save(imageEdit);
+                            } catch (Exception e) {
+                                System.err.println("Failed to save edit history: " + e.getMessage());
+                            }
+
                             return new ImageEditResponse(true, imageData, responseMimeType, "Image edited successfully");
                         }
                     }
@@ -98,9 +130,27 @@ public class GeminiService {
                         }
                     }
 
-                    return new ImageEditResponse(false, null, null,
-                            "API returned text instead of image: " + textResponse.toString());
+                    String errorMsg = "API returned text instead of image: " + textResponse.toString();
+                    try {
+                        User currentUser = getCurrentUser();
+                        ImageEdit imageEdit = new ImageEdit(prompt, mimeType, false, errorMsg);
+                        imageEdit.setUser(currentUser);
+                        imageEditRepository.save(imageEdit);
+                    } catch (Exception e) {
+                        System.err.println("Failed to save edit history: " + e.getMessage());
+                    }
+
+                    return new ImageEditResponse(false, null, null, errorMsg);
                 }
+            }
+
+            try {
+                User currentUser = getCurrentUser();
+                ImageEdit imageEdit = new ImageEdit(prompt, mimeType, false, "Unexpected API response format");
+                imageEdit.setUser(currentUser);
+                imageEditRepository.save(imageEdit);
+            } catch (Exception e) {
+                System.err.println("Failed to save edit history: " + e.getMessage());
             }
 
             return new ImageEditResponse(false, null, null, "Unexpected API response format");

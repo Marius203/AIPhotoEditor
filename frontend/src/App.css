@@ -7,6 +7,9 @@
 .app-header {
   padding: 1.5rem 3rem;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .app-header h1 {
@@ -26,8 +29,38 @@
   object-fit: contain;
 }
 
-.app-header p {
-  display: none;
+.header-user {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.username {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+.logout-button {
+  padding: 0.5rem 1.25rem;
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: 8px;
+  color: #fca5a5;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.logout-button:hover {
+  background: rgba(239, 68, 68, 0.2);
+  border-color: rgba(239, 68, 68, 0.5);
+  transform: translateY(-1px);
+}
+
+.logout-button:active {
+  transform: translateY(0);
 }
 
 .app-main {
@@ -95,8 +128,8 @@
 }
 
 .result-image-display img {
-  max-width: 100%;
-  max-height: 100%;
+  max-width: 800px;
+  max-height: 600px;
   width: auto;
   height: auto;
   object-fit: contain;

@@ -1,16 +1,48 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import './App.css';
 import ImageUpload from './components/ImageUpload';
 import PromptInput from './components/PromptInput';
 import ImageEditor from './components/ImageEditor';
+import Auth from './components/Auth';
 import logo from './assets/logo.png';
 
 function App() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [user, setUser] = useState(null);
   const [uploadedImage, setUploadedImage] = useState(null);
   const [prompt, setPrompt] = useState('');
   const [editedImage, setEditedImage] = useState(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState(null);
+
+  useEffect(() => {
+    // Check if user is already logged in
+    const token = localStorage.getItem('token');
+    const username = localStorage.getItem('username');
+    const email = localStorage.getItem('email');
+
+    if (token && username) {
+      setIsAuthenticated(true);
+      setUser({ username, email, token });
+    }
+  }, []);
+
+  const handleLogin = (userData) => {
+    setIsAuthenticated(true);
+    setUser(userData);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('username');
+    localStorage.removeItem('email');
+    setIsAuthenticated(false);
+    setUser(null);
+    setUploadedImage(null);
+    setEditedImage(null);
+    setPrompt('');
+    setError(null);
+  };
 
   const handleImageUpload = (imageFile) => {
     setUploadedImage(imageFile);
@@ -43,6 +75,7 @@ function App() {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
+              'Authorization': `Bearer ${user.token}`
             },
             body: JSON.stringify({
               imageData: base64Image,
@@ -80,11 +113,18 @@ function App() {
     }
   };
 
+  if (!isAuthenticated) {
+    return <Auth onLogin={handleLogin} />;
+  }
+
   return (
     <div className="app">
       <header className="app-header">
         <h1><img src={logo} alt="PolyEdits" className="header-logo" />PolyEdits</h1>
-        <p>Upload a photo and describe how you'd like to edit it</p>
+        <div className="header-user">
+          <span className="username">Welcome, {user.username}</span>
+          <button onClick={handleLogout} className="logout-button">Logout</button>
+        </div>
       </header>
 
       <main className="app-main">
