@@ -68,9 +68,9 @@ function ImageUpload({ onImageUpload }) {
                     </svg>
                     <p className="upload-text">
                         Drag and drop an image here, or{' '}
-                        <button type="button" onClick={onButtonClick} className="upload-button">
+                        <a onClick={onButtonClick} className="upload-button">
                             browse
-                        </button>
+                        </a>
                     </p>
                     <p className="upload-hint">Supports: JPG, PNG, GIF, WebP</p>
                 </div>

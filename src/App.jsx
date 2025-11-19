@@ -4,6 +4,7 @@ import './App.css';
 import ImageUpload from './components/ImageUpload';
 import PromptInput from './components/PromptInput';
 import ImageEditor from './components/ImageEditor';
+import logo from './assets/logo.png';
 
 function App() {
   const [uploadedImage, setUploadedImage] = useState(null);
@@ -35,59 +36,65 @@ function App() {
       // Convert image to base64
       const reader = new FileReader();
       reader.onloadend = async () => {
-        const base64Image = reader.result.split(',')[1];
+        try {
+          const base64Image = reader.result.split(',')[1];
 
-        // Call Gemini API
-        const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
-        if (!apiKey) {
-          throw new Error('API key not found. Please add VITE_GEMINI_API_KEY to your .env file');
-        }
-
-        const ai = new GoogleGenerativeAI(apiKey);
-        const model = ai.getGenerativeModel({ model: 'gemini-2.5-flash-image' });
-
-        const promptParts = [
-          { text: prompt },
-          {
-            inlineData: {
-              mimeType: uploadedImage.type,
-              data: base64Image,
-            },
-          },
-        ];
-
-        const result = await model.generateContent(promptParts);
-        const response = await result.response;
-
-        console.log('API Response:', response);
-
-        // Check if the response contains parts
-        if (response.candidates && response.candidates[0]?.content?.parts) {
-          const parts = response.candidates[0].content.parts;
-          console.log('Response parts:', parts);
-
-          // Look for inlineData with image
-          const imagePart = parts.find(part => part.inlineData);
-          if (imagePart && imagePart.inlineData) {
-            const editedImageData = `data:${imagePart.inlineData.mimeType};base64,${imagePart.inlineData.data}`;
-            setEditedImage(editedImageData);
-            console.log('Image found in response');
-          } else {
-            // If no image returned, show the text response
-            const textResponse = parts.map(part => part.text).filter(Boolean).join('');
-            console.log('Text response:', textResponse);
-            setError(`API Response: ${textResponse}\n\nNote: Gemini API returned text instead of an edited image. Image editing may not be supported in the current API version.`);
+          // Call Gemini API
+          const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+          if (!apiKey) {
+            throw new Error('API key not found. Please add VITE_GEMINI_API_KEY to your .env file');
           }
-        } else {
-          console.log('Unexpected response format');
-          setError('Unexpected API response format');
+
+          const ai = new GoogleGenerativeAI(apiKey);
+          const model = ai.getGenerativeModel({ model: 'gemini-2.5-flash-image' });
+
+          const promptParts = [
+            { text: prompt },
+            {
+              inlineData: {
+                mimeType: uploadedImage.type,
+                data: base64Image,
+              },
+            },
+          ];
+
+          const result = await model.generateContent(promptParts);
+          const response = await result.response;
+
+          console.log('API Response:', response);
+
+          // Check if the response contains parts
+          if (response.candidates && response.candidates[0]?.content?.parts) {
+            const parts = response.candidates[0].content.parts;
+            console.log('Response parts:', parts);
+
+            // Look for inlineData with image
+            const imagePart = parts.find(part => part.inlineData);
+            if (imagePart && imagePart.inlineData) {
+              const editedImageData = `data:${imagePart.inlineData.mimeType};base64,${imagePart.inlineData.data}`;
+              setEditedImage(editedImageData);
+              console.log('Image found in response');
+            } else {
+              // If no image returned, show the text response
+              const textResponse = parts.map(part => part.text).filter(Boolean).join('');
+              console.log('Text response:', textResponse);
+              setError(`API Response: ${textResponse}\n\nNote: Gemini API returned text instead of an edited image. Image editing may not be supported in the current API version.`);
+            }
+          } else {
+            console.log('Unexpected response format');
+            setError('Unexpected API response format');
+          }
+        } catch (err) {
+          console.error('Error:', err);
+          setError(err.message);
+        } finally {
+          setIsProcessing(false);
         }
       };
       reader.readAsDataURL(uploadedImage);
     } catch (err) {
       console.error('Error:', err);
       setError(err.message);
-    } finally {
       setIsProcessing(false);
     }
   };
@@ -95,12 +102,12 @@ function App() {
   return (
     <div className="app">
       <header className="app-header">
-        <h1>AI Photo Editor</h1>
+        <h1><img src={logo} alt="PolyEdits" className="header-logo" />PolyEdits</h1>
         <p>Upload a photo and describe how you'd like to edit it</p>
       </header>
 
       <main className="app-main">
-        <div className="left-column">
+        <div className="top-section">
           <div className="grid-item upload-box">
             <ImageUpload onImageUpload={handleImageUpload} />
           </div>
@@ -114,59 +121,60 @@ function App() {
             />
           </div>
 
-          <div className="button-row">
-            <button
-              onClick={handleEditImage}
-              className="generate-button"
-              disabled={!uploadedImage || !prompt.trim() || isProcessing}
-            >
-              {isProcessing ? 'Generating...' : 'Generate Picture'}
-            </button>
-
-            {editedImage && (
-              <button onClick={() => {
-                const link = document.createElement('a');
-                link.href = editedImage;
-                link.download = `edited-image-${Date.now()}.png`;
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-              }} className="download-button-main">
-                Download Picture
-              </button>
-            )}
-          </div>
-
-          {error && (
-            <div className="error">
-              <p>{error}</p>
-            </div>
-          )}
-        </div>
-
-        <div className="right-column">
-          <div className="original-image">
+          <div className="grid-item original-preview">
             {uploadedImage ? (
               <div className="image-display">
-                <h3>Original Image</h3>
+                <h3>Original</h3>
                 <img src={URL.createObjectURL(uploadedImage)} alt="Uploaded" />
               </div>
             ) : (
               <div className="placeholder-box">
-                <p>Upload an image to see it here</p>
+                <p>Preview</p>
               </div>
             )}
           </div>
+        </div>
 
-          <div className="result-image">
+        <div className="result-section">
+          <div className="result-header">
+            <h3>Generated Result</h3>
+            <div className="result-actions">
+              <button
+                onClick={handleEditImage}
+                className="generate-button"
+                disabled={!uploadedImage || !prompt.trim() || isProcessing}
+              >
+                {isProcessing ? 'Generating...' : 'Generate Picture'}
+              </button>
+
+              {editedImage && (
+                <button onClick={() => {
+                  const link = document.createElement('a');
+                  link.href = editedImage;
+                  link.download = `edited-image-${Date.now()}.png`;
+                  document.body.appendChild(link);
+                  link.click();
+                  document.body.removeChild(link);
+                }} className="download-button-main">
+                  Download
+                </button>
+              )}
+            </div>
+          </div>
+
+          <div className="result-content">
             {isProcessing ? (
               <div className="loading">
                 <div className="spinner"></div>
-                <p>Processing...</p>
+                <p>Generating your image...</p>
+                <div className="loading-dots">
+                  <div className="loading-dot"></div>
+                  <div className="loading-dot"></div>
+                  <div className="loading-dot"></div>
+                </div>
               </div>
             ) : editedImage ? (
-              <div className="image-display">
-                <h3>Edited Image</h3>
+              <div className="result-image-display">
                 <img src={editedImage} alt="Edited" />
               </div>
             ) : (
@@ -175,6 +183,12 @@ function App() {
               </div>
             )}
           </div>
+
+          {error && (
+            <div className="error">
+              <p>{error}</p>
+            </div>
+          )}
         </div>
       </main>
     </div>
