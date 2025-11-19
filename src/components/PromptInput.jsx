@@ -1,9 +1,11 @@
 import './PromptInput.css';
 
-function PromptInput({ prompt, onPromptChange, onSubmit, disabled }) {
+function PromptInput({ prompt, onPromptChange, onSubmit, disabled, hideButton }) {
     const handleSubmit = (e) => {
         e.preventDefault();
-        onSubmit();
+        if (onSubmit) {
+            onSubmit();
+        }
     };
 
     return (
@@ -15,21 +17,21 @@ function PromptInput({ prompt, onPromptChange, onSubmit, disabled }) {
                         id="prompt"
                         value={prompt}
                         onChange={(e) => onPromptChange(e.target.value)}
-                        placeholder="Describe how you'd like to edit the image... (e.g., 'Make it black and white', 'Add a vintage filter', 'Increase brightness')"
-                        rows={4}
+                        placeholder="Describe how you'd like to edit the image..."
+                        rows={6}
                         disabled={disabled}
                     />
                 </div>
-                <button
-                    type="submit"
-                    className="edit-button"
-                    disabled={disabled || !prompt.trim()}
-                >
-                    {disabled ? 'Processing...' : 'Edit Image'}
-                </button>
+                {!hideButton && (
+                    <button
+                        type="submit"
+                        className="edit-button"
+                        disabled={disabled || !prompt.trim()}
+                    >
+                        {disabled ? 'Processing...' : 'Edit Image'}
+                    </button>
+                )}
             </form>
         </div>
     );
-}
-
-export default PromptInput;
+} export default PromptInput;

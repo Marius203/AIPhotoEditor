@@ -1,70 +1,87 @@
 .prompt-input-container {
-    background: white;
-    border-radius: 16px;
+    background: transparent;
+    border-radius: 0;
     padding: 2rem;
-    border: 1px solid #e5e7eb;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.prompt-input-container form {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
 }
 
 .prompt-group {
-    margin-bottom: 1.5rem;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
 }
 
 .prompt-group label {
     display: block;
     font-weight: 600;
-    margin-bottom: 0.625rem;
-    color: #1f2937;
-    font-size: 1.125rem;
+    margin-bottom: 1rem;
+    color: #ffffff;
+    font-size: 0.9375rem;
 }
 
 .prompt-group textarea {
     width: 100%;
-    padding: 0.875rem 1rem;
-    border: 1px solid #d1d5db;
-    border-radius: 10px;
+    padding: 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
     font-size: 0.9375rem;
     font-family: inherit;
-    resize: vertical;
+    resize: none;
     transition: all 0.2s ease;
-    color: #1f2937;
+    color: #ffffff;
+    background: rgba(255, 255, 255, 0.03);
+    flex: 1;
+}
+
+.prompt-group textarea::placeholder {
+    color: rgba(255, 255, 255, 0.3);
 }
 
 .prompt-group textarea:focus {
     outline: none;
-    border-color: #3b82f6;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    border-color: #5b5fc7;
+    background: rgba(255, 255, 255, 0.05);
 }
 
 .prompt-group textarea:disabled {
-    background: #f9fafb;
+    background: rgba(255, 255, 255, 0.02);
     cursor: not-allowed;
-    color: #9ca3af;
+    color: rgba(255, 255, 255, 0.4);
 }
 
 .edit-button {
     width: 100%;
-    padding: 1rem;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
+    padding: 1rem 1.5rem;
+    background: #000000;
+    color: #ffffff;
     border: none;
-    border-radius: 8px;
-    font-size: 1.1rem;
+    border-radius: 0;
+    font-size: 0.875rem;
     font-weight: 600;
     cursor: pointer;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    transition: all 0.15s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
 }
 
 .edit-button:hover:not(:disabled) {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    background: #262626;
 }
 
 .edit-button:active:not(:disabled) {
-    transform: translateY(0);
+    background: #404040;
 }
 
 .edit-button:disabled {
-    background: #ccc;
+    background: #e5e5e5;
     cursor: not-allowed;
+    color: #a3a3a3;
 }

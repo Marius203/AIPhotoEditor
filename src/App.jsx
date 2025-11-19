@@ -100,40 +100,81 @@ function App() {
       </header>
 
       <main className="app-main">
-        <div className="upload-section">
-          <ImageUpload onImageUpload={handleImageUpload} />
-          {uploadedImage && (
-            <div className="uploaded-preview">
-              <h3>Original Image</h3>
-              <img src={URL.createObjectURL(uploadedImage)} alt="Uploaded" />
-            </div>
-          )}
-        </div>
+        <div className="left-column">
+          <div className="grid-item upload-box">
+            <ImageUpload onImageUpload={handleImageUpload} />
+          </div>
 
-        <div className="editor-section">
-          <PromptInput
-            prompt={prompt}
-            onPromptChange={handlePromptChange}
-            onSubmit={handleEditImage}
-            disabled={!uploadedImage || isProcessing}
-          />
+          <div className="grid-item prompt-box">
+            <PromptInput
+              prompt={prompt}
+              onPromptChange={handlePromptChange}
+              disabled={isProcessing}
+              hideButton={true}
+            />
+          </div>
 
-          {isProcessing && (
-            <div className="loading">
-              <div className="spinner"></div>
-              <p>Processing your image...</p>
-            </div>
-          )}
+          <div className="button-row">
+            <button
+              onClick={handleEditImage}
+              className="generate-button"
+              disabled={!uploadedImage || !prompt.trim() || isProcessing}
+            >
+              {isProcessing ? 'Generating...' : 'Generate Picture'}
+            </button>
+
+            {editedImage && (
+              <button onClick={() => {
+                const link = document.createElement('a');
+                link.href = editedImage;
+                link.download = `edited-image-${Date.now()}.png`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+              }} className="download-button-main">
+                Download Picture
+              </button>
+            )}
+          </div>
 
           {error && (
             <div className="error">
               <p>{error}</p>
             </div>
           )}
+        </div>
 
-          {editedImage && (
-            <ImageEditor editedImage={editedImage} />
-          )}
+        <div className="right-column">
+          <div className="original-image">
+            {uploadedImage ? (
+              <div className="image-display">
+                <h3>Original Image</h3>
+                <img src={URL.createObjectURL(uploadedImage)} alt="Uploaded" />
+              </div>
+            ) : (
+              <div className="placeholder-box">
+                <p>Upload an image to see it here</p>
+              </div>
+            )}
+          </div>
+
+          <div className="result-image">
+            {isProcessing ? (
+              <div className="loading">
+                <div className="spinner"></div>
+                <p>Processing...</p>
+              </div>
+            ) : editedImage ? (
+              <div className="image-display">
+                <h3>Edited Image</h3>
+                <img src={editedImage} alt="Edited" />
+              </div>
+            ) : (
+              <div className="placeholder-box">
+                <p>Your generated image will appear here</p>
+              </div>
+            )}
+          </div>
         </div>
       </main>
     </div>
