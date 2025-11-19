@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { GoogleGenerativeAI } from '@google/generative-ai';
 import './App.css';
 import ImageUpload from './components/ImageUpload';
 import PromptInput from './components/PromptInput';
@@ -39,50 +38,32 @@ function App() {
         try {
           const base64Image = reader.result.split(',')[1];
 
-          // Call Gemini API
-          const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
-          if (!apiKey) {
-            throw new Error('API key not found. Please add VITE_GEMINI_API_KEY to your .env file');
+          // Call backend API
+          const response = await fetch('http://localhost:8081/api/edit-image', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              imageData: base64Image,
+              prompt: prompt,
+              mimeType: uploadedImage.type
+            })
+          });
+
+          if (!response.ok) {
+            throw new Error('Failed to process image');
           }
 
-          const ai = new GoogleGenerativeAI(apiKey);
-          const model = ai.getGenerativeModel({ model: 'gemini-2.5-flash-image' });
+          const data = await response.json();
+          console.log('API Response:', data);
 
-          const promptParts = [
-            { text: prompt },
-            {
-              inlineData: {
-                mimeType: uploadedImage.type,
-                data: base64Image,
-              },
-            },
-          ];
-
-          const result = await model.generateContent(promptParts);
-          const response = await result.response;
-
-          console.log('API Response:', response);
-
-          // Check if the response contains parts
-          if (response.candidates && response.candidates[0]?.content?.parts) {
-            const parts = response.candidates[0].content.parts;
-            console.log('Response parts:', parts);
-
-            // Look for inlineData with image
-            const imagePart = parts.find(part => part.inlineData);
-            if (imagePart && imagePart.inlineData) {
-              const editedImageData = `data:${imagePart.inlineData.mimeType};base64,${imagePart.inlineData.data}`;
-              setEditedImage(editedImageData);
-              console.log('Image found in response');
-            } else {
-              // If no image returned, show the text response
-              const textResponse = parts.map(part => part.text).filter(Boolean).join('');
-              console.log('Text response:', textResponse);
-              setError(`API Response: ${textResponse}\n\nNote: Gemini API returned text instead of an edited image. Image editing may not be supported in the current API version.`);
-            }
+          if (data.success && data.imageData) {
+            const editedImageData = `data:${data.mimeType};base64,${data.imageData}`;
+            setEditedImage(editedImageData);
+            console.log('Image edited successfully');
           } else {
-            console.log('Unexpected response format');
-            setError('Unexpected API response format');
+            setError(data.message || 'Failed to edit image');
           }
         } catch (err) {
           console.error('Error:', err);
