@@ -25,7 +25,8 @@ public class ImageEditController {
             ImageEditResponse response = geminiService.editImage(
                     request.getImageData(),
                     request.getPrompt(),
-                    request.getMimeType()
+                    request.getMimeType(),
+                    request.getExpert()
             );
 
             return ResponseEntity.ok(response);

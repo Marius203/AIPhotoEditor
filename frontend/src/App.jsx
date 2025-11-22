@@ -4,6 +4,7 @@ import ImageUpload from './components/ImageUpload';
 import PromptInput from './components/PromptInput';
 import ImageEditor from './components/ImageEditor';
 import Auth from './components/Auth';
+import ExpertSelector from './components/ExpertSelector';
 import logo from './assets/logo.png';
 
 function App() {
@@ -11,6 +12,7 @@ function App() {
   const [user, setUser] = useState(null);
   const [uploadedImage, setUploadedImage] = useState(null);
   const [prompt, setPrompt] = useState('');
+  const [selectedExpert, setSelectedExpert] = useState('photographer');
   const [editedImage, setEditedImage] = useState(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState(null);
@@ -80,7 +82,8 @@ function App() {
             body: JSON.stringify({
               imageData: base64Image,
               prompt: prompt,
-              mimeType: uploadedImage.type
+              mimeType: uploadedImage.type,
+              expert: selectedExpert
             })
           });
 
@@ -134,6 +137,11 @@ function App() {
           </div>
 
           <div className="grid-item prompt-box">
+            <ExpertSelector
+              selectedExpert={selectedExpert}
+              onExpertChange={setSelectedExpert}
+              disabled={isProcessing}
+            />
             <PromptInput
               prompt={prompt}
               onPromptChange={handlePromptChange}

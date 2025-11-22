@@ -39,6 +39,7 @@
     color: #ffffff;
     background: rgba(255, 255, 255, 0.03);
     flex: 1;
+    max-height: 100px;
 }
 
 .prompt-group textarea::placeholder {

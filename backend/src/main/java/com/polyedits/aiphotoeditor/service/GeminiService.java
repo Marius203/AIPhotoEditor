@@ -44,7 +44,47 @@ public class GeminiService {
         return null;
     }
 
-    public ImageEditResponse editImage(String base64Image, String prompt, String mimeType) throws IOException {
+    private String getExpertSystemPrompt(String expert) {
+        if (expert == null || expert.isEmpty()) {
+            return "";
+        }
+
+        return switch (expert.toLowerCase()) {
+            case "interior_decorator" -> 
+                "You are an elite interior designer with decades of experience in transforming spaces. " +
+                "Your expertise includes color theory, spatial arrangement, lighting design, and creating harmonious living environments. " +
+                "Analyze the image carefully and apply your professional knowledge to fulfill the client's vision with precision and style. " +
+                "Consider lighting, proportions, color harmony, and modern design trends. ";
+            
+            case "fashion_stylist" -> 
+                "You are a world-renowned fashion stylist with an impeccable eye for style, trends, and clothing design. " +
+                "Your expertise spans haute couture, street fashion, color coordination, and body-flattering designs. " +
+                "Transform the image according to the client's request while maintaining fashion-forward aesthetics, " +
+                "considering fabric textures, color palettes, current trends, and timeless elegance. ";
+            
+            case "makeup_artist" -> 
+                "You are a professional makeup artist with mastery in cosmetic application, color theory, and facial enhancement techniques. " +
+                "Your skills include contouring, highlighting, color matching, and creating looks from natural to dramatic. " +
+                "Apply your expertise to enhance or transform the makeup in the image according to the client's wishes, " +
+                "considering skin tones, facial features, lighting, and the desired aesthetic (natural, glamorous, editorial, etc.). ";
+            
+            case "landscaper" -> 
+                "You are an expert landscape architect with deep knowledge of horticulture, garden design, and outdoor space transformation. " +
+                "Your expertise includes plant selection, hardscaping, water features, sustainable design, and seasonal planning. " +
+                "Transform the outdoor space in the image according to the client's vision, " +
+                "considering climate, maintenance, aesthetics, functionality, and natural harmony. ";
+            
+            case "photographer" -> 
+                "You are a master photographer with expertise in lighting, composition, color grading, and post-processing techniques. " +
+                "Your skills span portrait, landscape, commercial, and artistic photography. " +
+                "Apply your professional knowledge to enhance or modify the image according to the client's specifications, " +
+                "considering exposure, white balance, depth of field, and artistic vision. ";
+            
+            default -> "";
+        };
+    }
+
+    public ImageEditResponse editImage(String base64Image, String prompt, String mimeType, String expert) throws IOException {
         String url = String.format(
                 "https://generativelanguage.googleapis.com/v1beta/models/%s:generateContent?key=%s",
                 model, apiKey
@@ -56,9 +96,10 @@ public class GeminiService {
         JsonObject content = new JsonObject();
         JsonArray parts = new JsonArray();
 
-        // Add text part
+        // Add text part with expert system prompt
         JsonObject textPart = new JsonObject();
-        textPart.addProperty("text", prompt);
+        String fullPrompt = getExpertSystemPrompt(expert) + "Client Request: " + prompt;
+        textPart.addProperty("text", fullPrompt);
         parts.add(textPart);
 
         // Add image part
