@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Aperture, Loader2 } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
+import logo from '../assets/logo.png';
 import './Auth.css';
 
 function Auth({ onLogin }) {
@@ -57,9 +58,9 @@ function Auth({ onLogin }) {
             <div className="auth-card">
                 <div className="auth-header">
                     <div className="auth-logo">
-                        <Aperture className="auth-logo-icon" />
+                        <img src={logo} alt="PolyEdits Logo" className="auth-logo-image" />
                     </div>
-                    <h1 className="auth-title">PolyEdits AI</h1>
+                    <h1 className="auth-title">PolyEdits</h1>
                     <p className="auth-subtitle">Next-Gen Image Manipulation</p>
                 </div>
 

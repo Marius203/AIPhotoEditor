@@ -1,12 +1,14 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Home, Palette, Briefcase, Leaf, Camera, ChevronDown } from 'lucide-react';
+import { Home, Palette, Sparkles, Sun, Paintbrush, Clock, Package, Camera, ChevronDown } from 'lucide-react';
 
 const EXPERTS = [
-    { id: 'photographer', name: 'Photographer', icon: Camera, description: 'Photo enhancement' },
-    { id: 'interior_decorator', name: 'Interior Decorator', icon: Home, description: 'Transform living spaces' },
-    { id: 'fashion_stylist', name: 'Fashion Stylist', icon: Palette, description: 'Style & clothing design' },
-    { id: 'makeup_artist', name: 'Makeup Artist', icon: Briefcase, description: 'Cosmetic enhancement' },
-    { id: 'landscaper', name: 'Landscaper', icon: Leaf, description: 'Outdoor space design' },
+    { id: 'interior_decorator', name: 'Interior Decorator', icon: Home, description: 'Transform spaces with professional design expertise' },
+    { id: 'celebrity_make_up_artist', name: 'Celebrity Makeup Artist', icon: Sparkles, description: 'High-fashion beauty enhancement and color cosmetics' },
+    { id: 'fashion_stylist', name: 'Fashion Stylist', icon: Palette, description: 'Curate iconic looks with trend forecasting' },
+    { id: 'lighting_director', name: 'Lighting Director', icon: Sun, description: 'Master cinematography and atmospheric depth control' },
+    { id: 'digital_painter', name: 'Digital Painter', icon: Paintbrush, description: 'Artistic rendering with traditional media simulation' },
+    { id: 'time_traveler', name: 'Time Traveler', icon: Clock, description: 'Photo restoration and historical colorization expert' },
+    { id: 'product_photographer', name: 'Product Photographer', icon: Package, description: 'Commercial photography for e-commerce and marketing' },
 ];
 
 function ExpertSelector({ selectedExpert, onExpertChange, disabled }) {
@@ -61,7 +63,10 @@ function ExpertSelector({ selectedExpert, onExpertChange, disabled }) {
                                     onClick={() => handleSelect(expert.id)}
                                 >
                                     <Icon className="expert-option-icon" />
-                                    <span>{expert.name}</span>
+                                    <div className="expert-option-text">
+                                        <span className="expert-option-name">{expert.name}</span>
+                                        <span className="expert-option-description">{expert.description}</span>
+                                    </div>
                                 </button>
                             );
                         })}
