@@ -21,10 +21,13 @@
 
 .prompt-group label {
     display: block;
-    font-weight: 600;
+    font-weight: 700;
     margin-bottom: 1rem;
-    color: #ffffff;
-    font-size: 0.9375rem;
+    color: #22d3ee;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    text-shadow: 0 0 10px rgba(34, 211, 238, 0.5);
 }
 
 .prompt-group textarea {

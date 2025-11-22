@@ -1,5 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { Upload } from 'lucide-react';
+import './ImageUpload.css';
 
 function ImageUpload({ onImageUpload }) {
     const [dragActive, setDragActive] = useState(false);
@@ -39,12 +40,9 @@ function ImageUpload({ onImageUpload }) {
     };
 
     return (
-        <div className="h-full w-full">
+        <div className="image-upload-container">
             <form
-                className={`h-full w-full relative group flex flex-col items-center justify-center p-6 border-2 border-dashed rounded-2xl transition-all duration-300 ${dragActive
-                    ? 'border-cyan-500 bg-cyan-500/10 scale-[0.99]'
-                    : 'border-white/10 bg-slate-900/50 hover:border-white/20 hover:bg-slate-900/80'
-                    }`}
+                className={`upload-form ${dragActive ? 'drag-active' : ''}`}
                 onDragEnter={handleDrag}
                 onDragLeave={handleDrag}
                 onDragOver={handleDrag}
@@ -57,19 +55,16 @@ function ImageUpload({ onImageUpload }) {
                     type="file"
                     accept="image/*"
                     onChange={handleChange}
-                    className="hidden"
                 />
 
-                <div className="relative z-10 flex flex-col items-center text-center space-y-4">
-                    <div className={`p-4 rounded-full bg-slate-800/50 ring-1 ring-white/10 transition-all duration-500 group-hover:scale-110 group-hover:shadow-[0_0_30px_-10px_rgba(6,182,212,0.3)] ${dragActive ? 'text-cyan-400' : 'text-slate-400'}`}>
-                        <Upload className="w-8 h-8" />
-                    </div>
-                    <div className="space-y-2">
-                        <p className="text-sm font-medium text-slate-200">
-                            <span className="text-cyan-400">Click to upload</span> or drag and drop
-                        </p>
-                        <p className="text-xs text-slate-500">JPG, PNG, WEBP (Max 10MB)</p>
-                    </div>
+                <div className="upload-icon-wrapper">
+                    <Upload className="upload-icon" />
+                </div>
+                <div className="upload-content">
+                    <p className="upload-text">
+                        <span className="upload-text-highlight">Click to upload</span> or drag and drop
+                    </p>
+                    <p className="upload-subtext">JPG, PNG, WEBP (Max 10MB)</p>
                 </div>
             </form>
         </div>
