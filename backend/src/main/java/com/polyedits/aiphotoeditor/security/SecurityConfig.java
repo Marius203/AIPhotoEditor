@@ -36,7 +36,9 @@ public class SecurityConfig {
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/api/auth/**").permitAll()
-                .requestMatchers("/api/edit/**").authenticated()
+                .requestMatchers("/api/edit-image").permitAll()  // Allow guest access for image generation
+                .requestMatchers("/api/payment/**").permitAll()  // Allow access to payment endpoints
+                .requestMatchers("/api/download/**").authenticated()  // Require auth for downloads
                 .anyRequest().permitAll()
             )
             .sessionManagement(session -> session

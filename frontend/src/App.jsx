@@ -5,33 +5,50 @@ import PromptInput from './components/PromptInput';
 import ImageEditor from './components/ImageEditor';
 import Auth from './components/Auth';
 import ExpertSelector from './components/ExpertSelector';
+import DownloadModal from './components/DownloadModal';
+import PricingModal from './components/PricingModal';
 import logo from './assets/logo.png';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState(null);
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [showDownloadModal, setShowDownloadModal] = useState(false);
+  const [showPricingModal, setShowPricingModal] = useState(false);
   const [uploadedImage, setUploadedImage] = useState(null);
   const [prompt, setPrompt] = useState('');
-  const [selectedExpert, setSelectedExpert] = useState('photographer');
+  const [selectedExpert, setSelectedExpert] = useState('interior_decorator');
   const [editedImage, setEditedImage] = useState(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    // Check if user is already logged in
+    // Check if user is already logged in and fetch their credits
     const token = localStorage.getItem('token');
     const username = localStorage.getItem('username');
     const email = localStorage.getItem('email');
 
     if (token && username) {
       setIsAuthenticated(true);
-      setUser({ username, email, token });
+      // Fetch fresh user data including credits
+      fetchUserData(token, username, email);
     }
   }, []);
 
+  const fetchUserData = async (token, username, email) => {
+    try {
+      // You can create an endpoint to fetch user data, for now we'll set basic info
+      setUser({ username, email, token, credits: 0, paid: false });
+    } catch (error) {
+      console.error('Error fetching user data:', error);
+      setUser({ username, email, token, credits: 0, paid: false });
+    }
+  };
+
   const handleLogin = (userData) => {
     setIsAuthenticated(true);
-    setUser(userData);
+    setUser({ ...userData, credits: userData.credits || 0, paid: userData.paid || false });
+    setShowAuthModal(false);
   };
 
   const handleLogout = () => {
@@ -116,21 +133,63 @@ function App() {
     }
   };
 
-  if (!isAuthenticated) {
-    return <Auth onLogin={handleLogin} />;
-  }
-
   return (
     <div className="app">
       <header className="app-header">
         <h1><img src={logo} alt="PolyEdits" className="header-logo" />PolyEdits</h1>
         <div className="header-user">
-          <span className="username">Welcome, {user.username}</span>
-          <button onClick={handleLogout} className="logout-button">Logout</button>
+          {isAuthenticated ? (
+            <>
+              <div className="credits-display" onClick={() => setShowPricingModal(true)}>
+                <span className="credits-icon">⚡</span>
+                <span className="credits-count">{user.credits || 0}</span>
+                <span className="credits-text">credits</span>
+              </div>
+              <span className="username">Welcome, {user.username}</span>
+              <button onClick={handleLogout} className="logout-button">Logout</button>
+            </>
+          ) : (
+            <button onClick={() => setShowAuthModal(true)} className="login-button">Sign In</button>
+          )}
         </div>
       </header>
 
       <main className="app-main">
+        <section className="hero-section">
+          <div className="hero-background">
+            {/* Add your hero image here */}
+            <div className="hero-overlay"></div>
+          </div>
+          <div className="hero-content">
+            <div className="hero-badge">
+              <span className="badge-dot"></span>
+              AI-POWERED VISION
+            </div>
+            <h1 className="hero-title">
+              Transform Reality with
+              <span className="hero-title-gradient"> Neural Precision</span>
+            </h1>
+            <p className="hero-description">
+              Seven domain experts. Infinite possibilities. Watch as cutting-edge AI reshapes your images
+              with professional-grade artistry—from interior design to time-traveling restoration.
+            </p>
+            <div className="hero-stats">
+              <div className="hero-stat">
+                <div className="stat-number">7</div>
+                <div className="stat-label">Expert Domains</div>
+              </div>
+              <div className="hero-stat">
+                <div className="stat-number">Unlimited</div>
+                <div className="stat-label">Creative Possibilities</div>
+              </div>
+              <div className="hero-stat">
+                <div className="stat-number">AI</div>
+                <div className="stat-label">Neural Engine</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
         <div className="top-section">
           <div className="grid-item upload-box">
             <ImageUpload onImageUpload={handleImageUpload} />
@@ -177,13 +236,41 @@ function App() {
               </button>
 
               {editedImage && (
-                <button onClick={() => {
-                  const link = document.createElement('a');
-                  link.href = editedImage;
-                  link.download = `edited-image-${Date.now()}.png`;
-                  document.body.appendChild(link);
-                  link.click();
-                  document.body.removeChild(link);
+                <button onClick={async () => {
+                  // Check if user can download
+                  if (!isAuthenticated) {
+                    setShowDownloadModal(true);
+                    return;
+                  }
+
+                  // Check if user has paid flag
+                  if (!user.paid) {
+                    setShowDownloadModal(true);
+                    return;
+                  }
+
+                  // User can download - proceed with download and mark as downloaded
+                  try {
+                    const link = document.createElement('a');
+                    link.href = editedImage;
+                    link.download = `polyedits-${Date.now()}.png`;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+
+                    // Mark download in backend (sets paid=false)
+                    await fetch('http://localhost:8081/api/download/mark-downloaded', {
+                      method: 'POST',
+                      headers: {
+                        'Authorization': `Bearer ${user.token}`
+                      }
+                    });
+
+                    // Update local user state
+                    setUser({ ...user, paid: false });
+                  } catch (error) {
+                    console.error('Download error:', error);
+                  }
                 }} className="download-button-main">
                   Download
                 </button>
@@ -220,6 +307,36 @@ function App() {
           )}
         </div>
       </main>
+
+      {/* Modals */}
+      {showAuthModal && (
+        <div className="modal-overlay" onClick={() => setShowAuthModal(false)}>
+          <div onClick={(e) => e.stopPropagation()}>
+            <Auth onLogin={handleLogin} />
+          </div>
+        </div>
+      )}
+
+      <DownloadModal
+        isOpen={showDownloadModal}
+        onClose={() => setShowDownloadModal(false)}
+        isAuthenticated={isAuthenticated}
+        user={user}
+        onLogin={() => {
+          setShowDownloadModal(false);
+          setShowAuthModal(true);
+        }}
+        onBuyCredits={() => {
+          setShowDownloadModal(false);
+          setShowPricingModal(true);
+        }}
+      />
+
+      <PricingModal
+        isOpen={showPricingModal}
+        onClose={() => setShowPricingModal(false)}
+        user={user}
+      />
     </div>
   );
 }

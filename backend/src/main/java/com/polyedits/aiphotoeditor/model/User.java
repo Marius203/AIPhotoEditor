@@ -24,11 +24,19 @@ public class User {
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
+    @Column(nullable = false, columnDefinition = "INT DEFAULT 0")
+    private Integer credits = 0;
+
+    @Column(nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
+    private Boolean paid = false;
+
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ImageEdit> imageEdits = new ArrayList<>();
 
     public User() {
         this.createdAt = LocalDateTime.now();
+        this.credits = 0;
+        this.paid = false;
     }
 
     public User(String username, String email, String password) {
@@ -36,6 +44,8 @@ public class User {
         this.email = email;
         this.password = password;
         this.createdAt = LocalDateTime.now();
+        this.credits = 0;
+        this.paid = false;
     }
 
     public Long getId() {
@@ -84,5 +94,21 @@ public class User {
 
     public void setImageEdits(List<ImageEdit> imageEdits) {
         this.imageEdits = imageEdits;
+    }
+
+    public Integer getCredits() {
+        return credits;
+    }
+
+    public void setCredits(Integer credits) {
+        this.credits = credits;
+    }
+
+    public Boolean getPaid() {
+        return paid;
+    }
+
+    public void setPaid(Boolean paid) {
+        this.paid = paid;
     }
 }

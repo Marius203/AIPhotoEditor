@@ -54,100 +54,98 @@ function Auth({ onLogin }) {
     };
 
     return (
-        <div className="auth-container">
-            <div className="auth-card">
-                <div className="auth-header">
-                    <div className="auth-logo">
-                        <img src={logo} alt="PolyEdits Logo" className="auth-logo-image" />
-                    </div>
-                    <h1 className="auth-title">PolyEdits</h1>
-                    <p className="auth-subtitle">Next-Gen Image Manipulation</p>
+        <div className="auth-card">
+            <div className="auth-header">
+                <div className="auth-logo">
+                    <img src={logo} alt="PolyEdits Logo" className="auth-logo-image" />
                 </div>
-
-                <div className="auth-tabs">
-                    <button
-                        className={`auth-tab ${isLogin ? 'active' : ''}`}
-                        onClick={() => {
-                            setIsLogin(true);
-                            setError('');
-                        }}
-                    >
-                        Login
-                    </button>
-                    <button
-                        className={`auth-tab ${!isLogin ? 'active' : ''}`}
-                        onClick={() => {
-                            setIsLogin(false);
-                            setError('');
-                        }}
-                    >
-                        Register
-                    </button>
-                </div>
-
-                <form onSubmit={handleSubmit} className="auth-form">
-                    <div className="form-group">
-                        <label htmlFor="username" className="form-label">Username</label>
-                        <input
-                            id="username"
-                            type="text"
-                            name="username"
-                            value={formData.username}
-                            onChange={handleChange}
-                            className="form-input"
-                            placeholder="Enter your username"
-                            required
-                        />
-                    </div>
-
-                    {!isLogin && (
-                        <div className="form-group">
-                            <label htmlFor="email" className="form-label">Email</label>
-                            <input
-                                id="email"
-                                type="email"
-                                name="email"
-                                value={formData.email}
-                                onChange={handleChange}
-                                className="form-input"
-                                placeholder="Enter your email"
-                                required
-                            />
-                        </div>
-                    )}
-
-                    <div className="form-group">
-                        <label htmlFor="password" className="form-label">Password</label>
-                        <input
-                            id="password"
-                            type="password"
-                            name="password"
-                            value={formData.password}
-                            onChange={handleChange}
-                            className="form-input"
-                            placeholder="Enter your password"
-                            required
-                        />
-                    </div>
-
-                    <button type="submit" className="auth-submit" disabled={isLoading}>
-                        {isLoading ? (
-                            <>
-                                <Loader2 className="loading-icon" />
-                                Processing...
-                            </>
-                        ) : (
-                            isLogin ? 'Sign In' : 'Create Account'
-                        )}
-                    </button>
-
-                    {error && (
-                        <div className="auth-error">
-                            {error}
-                        </div>
-                    )}
-                </form>
+                <h1 className="auth-title">PolyEdits</h1>
+                <p className="auth-subtitle">Next-Gen Image Manipulation</p>
             </div>
+
+            <div className="auth-tabs">
+                <button
+                    className={`auth-tab ${isLogin ? 'active' : ''}`}
+                    onClick={() => {
+                        setIsLogin(true);
+                        setError('');
+                    }}
+                >
+                    Login
+                </button>
+                <button
+                    className={`auth-tab ${!isLogin ? 'active' : ''}`}
+                    onClick={() => {
+                        setIsLogin(false);
+                        setError('');
+                    }}
+                >
+                    Register
+                </button>
+            </div>
+
+            <form onSubmit={handleSubmit} className="auth-form">
+                <div className="form-group">
+                    <label htmlFor="username" className="form-label">Username</label>
+                    <input
+                        id="username"
+                        type="text"
+                        name="username"
+                        value={formData.username}
+                        onChange={handleChange}
+                        className="form-input"
+                        placeholder="Enter your username"
+                        required
+                    />
+                </div>
+
+                {!isLogin && (
+                    <div className="form-group">
+                        <label htmlFor="email" className="form-label">Email</label>
+                        <input
+                            id="email"
+                            type="email"
+                            name="email"
+                            value={formData.email}
+                            onChange={handleChange}
+                            className="form-input"
+                            placeholder="Enter your email"
+                            required
+                        />
+                    </div>
+                )}
+
+                <div className="form-group">
+                    <label htmlFor="password" className="form-label">Password</label>
+                    <input
+                        id="password"
+                        type="password"
+                        name="password"
+                        value={formData.password}
+                        onChange={handleChange}
+                        className="form-input"
+                        placeholder="Enter your password"
+                        required
+                    />
+                </div>
+
+                <button type="submit" className="auth-submit" disabled={isLoading}>
+                    {isLoading ? (
+                        <>
+                            <Loader2 className="loading-icon" />
+                            Processing...
+                        </>
+                    ) : (
+                        isLogin ? 'Sign In' : 'Create Account'
+                    )}
+                </button>
+
+                {error && (
+                    <div className="auth-error">
+                        {error}
+                    </div>
+                )}
+            </form>
         </div>
     );
 }

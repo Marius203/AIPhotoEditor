@@ -1,3 +1,10 @@
+# Environment Variables
+.env
+.env.local
+.env.*.local
+backend/.env
+frontend/.env
+
 # Logs
 logs
 *.log
@@ -6,20 +13,30 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
+
+# Dependencies
 node_modules
 dist
 dist-ssr
 *.local
-.env
-application.properties
 
-# Editor directories and files
+# Backend Build
+backend/target/
+backend/.mvn/
+backend/mvnw
+backend/mvnw.cmd
+
+# IDE
 .vscode/*
 !.vscode/extensions.json
 .idea
+*.iml
 .DS_Store
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
+
+# OS
+Thumbs.db

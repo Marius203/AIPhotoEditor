@@ -100,6 +100,21 @@ public class GeminiService {
     }
 
     public ImageEditResponse editImage(String base64Image, String prompt, String mimeType, String expert) throws IOException {
+        // Check if user is authenticated and handle credits
+        User currentUser = getCurrentUser();
+        if (currentUser != null) {
+            // User is authenticated - check and deduct credits
+            if (currentUser.getCredits() < 10) {
+                return new ImageEditResponse(false, null, null, "Insufficient credits. You need 10 credits to generate an image.");
+            }
+            
+            // Deduct credits and set paid flag
+            currentUser.setCredits(currentUser.getCredits() - 10);
+            currentUser.setPaid(true);
+            userRepository.save(currentUser);
+        }
+        // If currentUser is null, guest user - allow generation without credits
+        
         String url = String.format(
                 "https://generativelanguage.googleapis.com/v1beta/models/%s:generateContent?key=%s",
                 model, apiKey
@@ -165,7 +180,6 @@ public class GeminiService {
 
                             // Save to DB with current user
                             try {
-                                User currentUser = getCurrentUser();
                                 ImageEdit imageEdit = new ImageEdit(prompt, mimeType, true, null);
                                 imageEdit.setUser(currentUser);
                                 imageEditRepository.save(imageEdit);
@@ -188,7 +202,6 @@ public class GeminiService {
 
                     String errorMsg = "API returned text instead of image: " + textResponse.toString();
                     try {
-                        User currentUser = getCurrentUser();
                         ImageEdit imageEdit = new ImageEdit(prompt, mimeType, false, errorMsg);
                         imageEdit.setUser(currentUser);
                         imageEditRepository.save(imageEdit);
@@ -201,7 +214,6 @@ public class GeminiService {
             }
 
             try {
-                User currentUser = getCurrentUser();
                 ImageEdit imageEdit = new ImageEdit(prompt, mimeType, false, "Unexpected API response format");
                 imageEdit.setUser(currentUser);
                 imageEditRepository.save(imageEdit);
