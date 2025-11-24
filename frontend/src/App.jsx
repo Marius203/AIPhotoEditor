@@ -9,6 +9,9 @@ import DownloadModal from './components/DownloadModal';
 import PricingModal from './components/PricingModal';
 import logo from './assets/logo.png';
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://192.168.96.1:8081';
+console.log('API_URL:', API_URL);
+
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState(null);
@@ -21,6 +24,7 @@ function App() {
   const [editedImage, setEditedImage] = useState(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState(null);
+  const [guestGenerationUsed, setGuestGenerationUsed] = useState(false); // Track guest generation
 
   useEffect(() => {
     // Check if user is already logged in and fetch their credits
@@ -32,6 +36,12 @@ function App() {
       setIsAuthenticated(true);
       // Fetch fresh user data including credits
       fetchUserData(token, username, email);
+    }
+
+    // Check if guest has already generated an image
+    const guestUsed = sessionStorage.getItem('guestGenerationUsed');
+    if (guestUsed === 'true') {
+      setGuestGenerationUsed(true);
     }
   }, []);
 
@@ -49,6 +59,9 @@ function App() {
     setIsAuthenticated(true);
     setUser({ ...userData, credits: userData.credits || 0, paid: userData.paid || false });
     setShowAuthModal(false);
+    // Reset guest generation limit after login
+    setGuestGenerationUsed(false);
+    sessionStorage.removeItem('guestGenerationUsed');
   };
 
   const handleLogout = () => {
@@ -61,6 +74,8 @@ function App() {
     setEditedImage(null);
     setPrompt('');
     setError(null);
+    setGuestGenerationUsed(false);
+    sessionStorage.removeItem('guestGenerationUsed');
   };
 
   const handleImageUpload = (imageFile) => {
@@ -79,6 +94,13 @@ function App() {
       return;
     }
 
+    // Check if guest has already used their free generation
+    if (!isAuthenticated && guestGenerationUsed) {
+      setError('You have used your free generation. Please sign in to continue.');
+      setShowAuthModal(true);
+      return;
+    }
+
     setIsProcessing(true);
     setError(null);
 
@@ -89,13 +111,19 @@ function App() {
         try {
           const base64Image = reader.result.split(',')[1];
 
+          // Build headers - only add Authorization if user is authenticated
+          const headers = {
+            'Content-Type': 'application/json'
+          };
+
+          if (user && user.token) {
+            headers['Authorization'] = `Bearer ${user.token}`;
+          }
+
           // Call backend API
-          const response = await fetch('http://localhost:8081/api/edit-image', {
+          const response = await fetch(`${API_URL}/api/edit-image`, {
             method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${user.token}`
-            },
+            headers: headers,
             body: JSON.stringify({
               imageData: base64Image,
               prompt: prompt,
@@ -114,6 +142,18 @@ function App() {
           if (data.success && data.imageData) {
             const editedImageData = `data:${data.mimeType};base64,${data.imageData}`;
             setEditedImage(editedImageData);
+
+            // If guest, mark their free generation as used
+            if (!isAuthenticated) {
+              setGuestGenerationUsed(true);
+              sessionStorage.setItem('guestGenerationUsed', 'true');
+            }
+
+            // If authenticated, refresh user credits
+            if (isAuthenticated && user && data.remainingCredits !== undefined) {
+              setUser({ ...user, credits: data.remainingCredits, paid: true });
+            }
+
             console.log('Image edited successfully');
           } else {
             setError(data.message || 'Failed to edit image');
@@ -179,7 +219,7 @@ function App() {
                 <div className="stat-label">Expert Domains</div>
               </div>
               <div className="hero-stat">
-                <div className="stat-number">Unlimited</div>
+                <div className="stat-number">∞</div>
                 <div className="stat-label">Creative Possibilities</div>
               </div>
               <div className="hero-stat">
@@ -190,6 +230,13 @@ function App() {
           </div>
         </section>
 
+        {/* Guest generation limit warning */}
+        {!isAuthenticated && guestGenerationUsed && (
+          <div className="guest-limit-banner">
+            <p>🎉 You've used your free generation! <button onClick={() => setShowAuthModal(true)} className="banner-link">Sign in</button> to create unlimited images with credits.</p>
+          </div>
+        )}
+
         <div className="top-section">
           <div className="grid-item upload-box">
             <ImageUpload onImageUpload={handleImageUpload} />
@@ -199,12 +246,12 @@ function App() {
             <ExpertSelector
               selectedExpert={selectedExpert}
               onExpertChange={setSelectedExpert}
-              disabled={isProcessing}
+              disabled={isProcessing || (!isAuthenticated && guestGenerationUsed)}
             />
             <PromptInput
               prompt={prompt}
               onPromptChange={handlePromptChange}
-              disabled={isProcessing}
+              disabled={isProcessing || (!isAuthenticated && guestGenerationUsed)}
               hideButton={true}
             />
           </div>
@@ -230,14 +277,14 @@ function App() {
               <button
                 onClick={handleEditImage}
                 className="generate-button"
-                disabled={!uploadedImage || !prompt.trim() || isProcessing}
+                disabled={!uploadedImage || !prompt.trim() || isProcessing || (!isAuthenticated && guestGenerationUsed)}
               >
-                {isProcessing ? 'Generating...' : 'Generate Picture'}
+                {isProcessing ? 'Generating...' : (!isAuthenticated && guestGenerationUsed ? 'Sign In to Continue' : 'Generate Picture')}
               </button>
 
               {editedImage && (
                 <button onClick={async () => {
-                  // Check if user can download
+                  // Block guests from downloading
                   if (!isAuthenticated) {
                     setShowDownloadModal(true);
                     return;
@@ -259,7 +306,7 @@ function App() {
                     document.body.removeChild(link);
 
                     // Mark download in backend (sets paid=false)
-                    await fetch('http://localhost:8081/api/download/mark-downloaded', {
+                    await fetch(`${API_URL}/api/download/mark-downloaded`, {
                       method: 'POST',
                       headers: {
                         'Authorization': `Bearer ${user.token}`
@@ -272,7 +319,7 @@ function App() {
                     console.error('Download error:', error);
                   }
                 }} className="download-button-main">
-                  Download
+                  {!isAuthenticated ? '🔒 Sign In to Download' : 'Download'}
                 </button>
               )}
             </div>

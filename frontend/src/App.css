@@ -2,6 +2,19 @@
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  -webkit-tap-highlight-color: transparent;
+  /* Remove tap highlight on mobile */
+  -webkit-touch-callout: none;
+  /* Disable callout on iOS */
+}
+
+/* Improve touch targets for mobile */
+button,
+.credits-display,
+input,
+select {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
 }
 
 .app-header {
@@ -604,22 +617,357 @@
   margin-top: 1rem;
 }
 
+/* Mobile Optimizations */
 @media (max-width: 768px) {
-  .app-main {
-    padding: 1.5rem;
-  }
 
-  .top-section {
-    grid-template-columns: 1fr;
-    height: auto;
+  /* Header */
+  .app-header {
+    padding: 1rem 1.5rem;
+    flex-wrap: wrap;
+    gap: 0.75rem;
   }
 
   .app-header h1 {
-    font-size: 1.25rem;
+    font-size: 1.125rem;
+    gap: 0.375rem;
+  }
+
+  .header-logo {
+    width: 24px;
+    height: 24px;
+  }
+
+  .header-user {
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  .credits-display {
+    padding: 0.375rem 0.75rem;
+    font-size: 0.875rem;
+  }
+
+  .credits-count {
+    font-size: 1rem;
+  }
+
+  .credits-text {
+    display: none;
+  }
+
+  .username {
+    display: none;
+  }
+
+  .login-button,
+  .logout-button {
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+  }
+
+  /* Main Content */
+  .app-main {
+    padding: 1rem;
+  }
+
+  /* Hero Section */
+  .hero-section {
+    min-height: auto;
+    padding: 2rem 1rem;
+  }
+
+  .hero-badge {
+    font-size: 0.625rem;
+    padding: 0.375rem 0.75rem;
+    gap: 0.375rem;
+  }
+
+  .badge-dot {
+    width: 6px;
+    height: 6px;
+  }
+
+  .hero-title {
+    font-size: 1.75rem;
+    line-height: 1.2;
+    margin-bottom: 1rem;
+  }
+
+  .hero-description {
+    font-size: 0.875rem;
+    line-height: 1.5;
+    margin-bottom: 1.5rem;
+  }
+
+  .hero-stats {
+    flex-direction: row;
+    gap: 1rem;
+    justify-content: center;
+  }
+
+  .hero-stat {
+    flex: 1;
+    min-width: 80px;
+  }
+
+  .stat-number {
+    font-size: 1.5rem;
+  }
+
+  .stat-label {
+    font-size: 0.625rem;
+  }
+
+  /* Guest Banner */
+  .guest-limit-banner {
+    padding: 0.75rem 1rem;
+    margin: 0.75rem 0;
+    font-size: 0.875rem;
+  }
+
+  .guest-limit-banner p {
+    font-size: 0.875rem;
+  }
+
+  /* Top Section Grid */
+  .top-section {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    height: auto;
+  }
+
+  .grid-item {
+    padding: 1rem;
+  }
+
+  /* Expert Selector */
+  .expert-selector-dropdown {
+    margin: 0 0 1rem 0;
+    max-width: 100%;
+  }
+
+  .expert-label {
+    font-size: 0.7rem;
+  }
+
+  .expert-select {
+    padding: 0.75rem 2.5rem 0.75rem 2.5rem;
+    font-size: 0.875rem;
+  }
+
+  .expert-icon {
+    left: 0.75rem;
+    width: 1rem;
+    height: 1rem;
+  }
+
+  .expert-name {
+    font-size: 0.875rem;
+  }
+
+  .expert-chevron {
+    right: 0.75rem;
+    width: 1rem;
+    height: 1rem;
+  }
+
+  .expert-option {
+    padding: 0.625rem;
+    gap: 0.5rem;
+  }
+
+  .expert-option-icon {
+    width: 1rem;
+    height: 1rem;
+  }
+
+  .expert-option-name {
+    font-size: 0.8rem;
+  }
+
+  .expert-option-description {
+    font-size: 0.65rem;
+  }
+
+  /* Images */
+  .image-display h3 {
+    font-size: 0.875rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .image-display img {
+    max-height: 250px;
+  }
+
+  .placeholder-box {
+    min-height: 150px;
+    font-size: 0.875rem;
+  }
+
+  /* Result Section */
+  .result-section {
+    padding: 1.5rem 1rem;
+    margin-top: 1rem;
+  }
+
+  .result-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1rem;
+  }
+
+  .result-header h3 {
+    font-size: 1rem;
+    margin-bottom: 0;
   }
 
   .result-actions {
     flex-direction: column;
+    gap: 0.75rem;
+    width: 100%;
+  }
+
+  .generate-button,
+  .download-button-main {
+    width: 100%;
+    padding: 1rem;
+    font-size: 0.875rem;
+  }
+
+  .result-image-display img {
+    max-height: 400px;
+  }
+
+  /* Loading */
+  .loading p {
+    font-size: 0.875rem;
+  }
+
+  .spinner {
+    width: 40px;
+    height: 40px;
+    border-width: 3px;
+  }
+
+  /* Error */
+  .error {
+    padding: 0.875rem;
+    font-size: 0.8rem;
+    margin-top: 0.75rem;
+  }
+}
+
+/* Extra Small Mobile (iPhone SE, small phones) */
+@media (max-width: 375px) {
+  .app-header {
+    padding: 0.75rem 1rem;
+  }
+
+  .app-header h1 {
+    font-size: 1rem;
+  }
+
+  .header-logo {
+    width: 20px;
+    height: 20px;
+  }
+
+  .credits-display {
+    padding: 0.25rem 0.5rem;
+    gap: 0.25rem;
+  }
+
+  .credits-icon {
+    font-size: 0.875rem;
+  }
+
+  .credits-count {
+    font-size: 0.875rem;
+  }
+
+  .login-button,
+  .logout-button {
+    padding: 0.375rem 0.75rem;
+    font-size: 0.75rem;
+  }
+
+  .hero-title {
+    font-size: 1.5rem;
+  }
+
+  .hero-description {
+    font-size: 0.8rem;
+  }
+
+  .stat-number {
+    font-size: 1.25rem;
+  }
+
+  .stat-label {
+    font-size: 0.6rem;
+  }
+
+  .generate-button,
+  .download-button-main {
+    padding: 0.875rem;
+    font-size: 0.8rem;
+  }
+
+  .result-image-display img {
+    max-height: 300px;
+  }
+}
+
+/* Landscape Mobile */
+@media (max-width: 768px) and (orientation: landscape) {
+  .hero-section {
+    padding: 1.5rem 1rem;
+  }
+
+  .hero-title {
+    font-size: 1.5rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .hero-description {
+    margin-bottom: 1rem;
+  }
+
+  .hero-stats {
+    gap: 1.5rem;
+  }
+
+  .image-display img,
+  .result-image-display img {
+    max-height: 200px;
+  }
+}
+
+/* Tablet Optimization */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .app-header {
+    padding: 1.25rem 2rem;
+  }
+
+  .app-main {
+    padding: 2rem;
+  }
+
+  .top-section {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+  }
+
+  .prompt-box {
+    grid-column: 1 / -1;
+  }
+
+  .hero-title {
+    font-size: 2.5rem;
+  }
+
+  .result-section {
+    padding: 2rem;
   }
 }
 
@@ -799,4 +1147,38 @@
   font-size: 0.7rem;
   color: rgba(148, 163, 184, 0.8);
   line-height: 1.2;
+}
+
+/* Guest limit banner */
+.guest-limit-banner {
+  background: linear-gradient(135deg, rgba(34, 211, 238, 0.1), rgba(59, 130, 246, 0.1));
+  border: 1px solid rgba(34, 211, 238, 0.3);
+  border-radius: 12px;
+  padding: 1rem 1.5rem;
+  margin: 1rem auto;
+  max-width: 1400px;
+  text-align: center;
+  box-shadow: 0 0 20px rgba(34, 211, 238, 0.2);
+}
+
+.guest-limit-banner p {
+  margin: 0;
+  color: #22d3ee;
+  font-size: 1rem;
+}
+
+.banner-link {
+  background: none;
+  border: none;
+  color: #3b82f6;
+  font-weight: 600;
+  text-decoration: underline;
+  cursor: pointer;
+  padding: 0 0.25rem;
+  transition: all 0.2s;
+}
+
+.banner-link:hover {
+  color: #22d3ee;
+  text-shadow: 0 0 10px rgba(34, 211, 238, 0.5);
 }

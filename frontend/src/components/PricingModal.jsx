@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { X, CreditCard, Zap, Star, Crown, Loader2 } from 'lucide-react';
 import './PricingModal.css';
 
+const API_URL = 'http://192.168.96.1:8081';
+
 const CREDIT_PACKAGES = [
     {
         id: 'starter',
@@ -63,7 +65,7 @@ function PricingModal({ isOpen, onClose, user }) {
         setSelectedPackage(pkg.id);
 
         try {
-            const response = await fetch('http://localhost:8081/api/payment/create-checkout-session', {
+            const response = await fetch(`${API_URL}/api/payment/create-checkout-session`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

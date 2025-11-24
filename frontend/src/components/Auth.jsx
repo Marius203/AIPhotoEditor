@@ -3,6 +3,8 @@ import { Loader2 } from 'lucide-react';
 import logo from '../assets/logo.png';
 import './Auth.css';
 
+const API_URL = 'http://192.168.96.1:8081';
+
 function Auth({ onLogin }) {
     const [isLogin, setIsLogin] = useState(true);
     const [formData, setFormData] = useState({
@@ -24,7 +26,7 @@ function Auth({ onLogin }) {
                 ? { username: formData.username, password: formData.password }
                 : formData;
 
-            const response = await fetch(`http://localhost:8081${endpoint}`, {
+            const response = await fetch(`${API_URL}${endpoint}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
